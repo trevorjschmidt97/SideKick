@@ -1,0 +1,12 @@
+load("@rules_swift//swift:swift.bzl", "swift_library")
+
+swift_library(
+    name = "GameManagers",
+    srcs = ["GameManager.swift"],
+    module_name = "GameManagers",
+    deps = ["//Sources/GameCore:GameCore"],
+    visibility = [
+        "//Sources/PartyGameAppleApp:__pkg__",
+        "//Tests/SideKickTests:__pkg__",
+    ],
+)

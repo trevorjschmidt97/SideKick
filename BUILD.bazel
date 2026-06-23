@@ -1,0 +1,16 @@
+package(default_visibility = ["//visibility:private"])
+
+package_group(
+    name = "sidekick_packages",
+    packages = [
+        "//Apps/...",
+        "//Sources/...",
+        "//Tests/...",
+    ],
+)
+
+test_suite(
+    name = "all_tests",
+    tests = ["//Tests/SideKickTests:SideKickTests"],
+    visibility = ["//visibility:public"],
+)

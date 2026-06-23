@@ -1,0 +1,12 @@
+load("@rules_swift//swift:swift.bzl", "swift_library")
+
+swift_library(
+    name = "GameIntents",
+    srcs = ["GameIntents.swift"],
+    module_name = "GameIntents",
+    deps = ["//Sources/GameCore:GameCore"],
+    visibility = [
+        "//Sources/PartyGameAppleApp:__pkg__",
+        "//Tests/SideKickTests:__pkg__",
+    ],
+)

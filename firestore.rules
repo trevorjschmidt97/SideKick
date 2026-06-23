@@ -1,0 +1,83 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function allowedRoomFields() {
+      return [
+        'id',
+        'joinCode',
+        'hostID',
+        'playerIDs',
+        'phase',
+        'selectedClueID',
+        'firstBuzzedPlayerID',
+        'board',
+        'players'
+      ];
+    }
+
+    function isHost(roomID) {
+      return signedIn()
+        && exists(/databases/$(database)/documents/rooms/$(roomID))
+        && request.auth.uid == get(/databases/$(database)/documents/rooms/$(roomID)).data.hostID;
+    }
+
+    function immutableRoomFieldsUnchanged() {
+      return request.resource.data.id == resource.data.id
+        && request.resource.data.joinCode == resource.data.joinCode
+        && request.resource.data.hostID == resource.data.hostID;
+    }
+
+    function isWaitingJoin() {
+      return signedIn()
+        && resource.data.phase == 'waiting'
+        && request.resource.data.phase == 'waiting'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['players', 'playerIDs'])
+        && request.resource.data.players.size() == resource.data.players.size() + 1
+        && request.resource.data.playerIDs.size() == resource.data.playerIDs.size() + 1
+        && request.resource.data.playerIDs.hasAll(resource.data.playerIDs)
+        && request.resource.data.playerIDs.hasAll([request.auth.uid])
+        && !resource.data.playerIDs.hasAny([request.auth.uid]);
+    }
+
+    function isFirstBuzz() {
+      return signedIn()
+        && resource.data.phase == 'clueOpen'
+        && request.resource.data.phase == 'buzzLocked'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['phase', 'firstBuzzedPlayerID'])
+        && resource.data.firstBuzzedPlayerID == null
+        && request.resource.data.firstBuzzedPlayerID == request.auth.uid
+        && resource.data.playerIDs.hasAny([request.auth.uid]);
+    }
+
+    match /rooms/{roomID} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(allowedRoomFields())
+        && request.resource.data.hostID == request.auth.uid
+        && request.resource.data.playerIDs.size() == 0
+        && request.resource.data.players.size() == 0
+        && request.resource.data.phase == 'waiting';
+      allow update: if (
+          isHost(roomID)
+          && request.resource.data.keys().hasOnly(allowedRoomFields())
+          && immutableRoomFieldsUnchanged()
+        )
+        || (
+          request.resource.data.keys().hasOnly(allowedRoomFields())
+          && immutableRoomFieldsUnchanged()
+          && (isWaitingJoin() || isFirstBuzz())
+        );
+    }
+
+    match /joinCodes/{joinCode} {
+      allow read: if signedIn();
+      allow create, update, delete: if signedIn()
+        && request.resource.data.keys().hasOnly(['roomID', 'hostID'])
+        && request.resource.data.hostID == request.auth.uid;
+    }
+  }
+}

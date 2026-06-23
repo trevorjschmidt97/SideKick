@@ -1,0 +1,20 @@
+load("@rules_swift//swift:swift.bzl", "swift_test")
+
+swift_test(
+    name = "SideKickTests",
+    srcs = glob(["*.swift"]),
+    module_name = "SideKickTests",
+    deps = [
+        "//Sources/FirebaseGameService:FirebaseGameService",
+        "//Sources/GameCore:GameCore",
+        "//Sources/GameIntents:GameIntents",
+        "//Sources/GameModules:BoardGameModule",
+        "//Sources/GameModules:GameEntryModule",
+        "//Sources/GameModules:GameModuleShared",
+        "//Sources/GameModules:JoinGameModule",
+        "//Sources/GameManagers:GameManagers",
+        "//Sources/GameServices:GameServices",
+        "//Sources/PartyGameAppleApp:PartyGameAppleApp",
+        "//Sources/SideKickAppCore:SideKickAppCore",
+    ],
+)

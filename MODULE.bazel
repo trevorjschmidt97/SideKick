@@ -1,0 +1,22 @@
+module(
+    name = "sidekick",
+    version = "0.1.0",
+)
+
+bazel_dep(name = "rules_swift", version = "3.6.0")
+bazel_dep(name = "rules_apple", version = "4.3.3")
+bazel_dep(name = "rules_swift_package_manager", version = "1.19.0")
+
+swift_deps = use_extension(
+    "@rules_swift_package_manager//:extensions.bzl",
+    "swift_deps",
+)
+swift_deps.from_package(
+    resolved = "//:Package.resolved",
+    swift = "//:Package.swift",
+)
+use_repo(
+    swift_deps,
+    "swift_package",
+    "swiftpkg_firebase_ios_sdk",
+)

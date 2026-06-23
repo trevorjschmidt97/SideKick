@@ -1,0 +1,81 @@
+load("@rules_apple//apple:ios.bzl", "ios_application")
+load("@rules_apple//apple:macos.bzl", "macos_application")
+load("@rules_apple//apple:tvos.bzl", "tvos_application")
+load("@rules_apple//apple:watchos.bzl", "watchos_application")
+load("@rules_swift//swift:swift.bzl", "swift_library")
+
+swift_library(
+    name = "PartyGame_iOSMain",
+    srcs = ["Sources/PartyGameIOSMain.swift"],
+    deps = [
+        "//Sources/GameServices:GameServices",
+        "//Sources/PartyGameAppleApp:PartyGameAppleApp",
+        "//Sources/SideKickAppCore:SideKickAppCore",
+    ],
+)
+
+swift_library(
+    name = "PartyGame_macOSMain",
+    srcs = ["Sources/PartyGameMacMain.swift"],
+    deps = [
+        "//Sources/GameServices:GameServices",
+        "//Sources/PartyGameAppleApp:PartyGameAppleApp",
+        "//Sources/SideKickAppCore:SideKickAppCore",
+    ],
+)
+
+swift_library(
+    name = "PartyGame_tvOSMain",
+    srcs = ["Sources/PartyGameTVMain.swift"],
+    deps = [
+        "//Sources/GameServices:GameServices",
+        "//Sources/PartyGameAppleApp:PartyGameAppleApp",
+        "//Sources/SideKickAppCore:SideKickAppCore",
+    ],
+)
+
+swift_library(
+    name = "PartyGame_watchOSMain",
+    srcs = ["Sources/PartyGameWatchMain.swift"],
+    deps = [
+        "//Sources/GameServices:GameServices",
+        "//Sources/PartyGameAppleApp:PartyGameAppleApp",
+        "//Sources/SideKickAppCore:SideKickAppCore",
+    ],
+)
+
+ios_application(
+    name = "PartyGame_iOS",
+    bundle_id = "com.sidekick.partygame",
+    families = [
+        "iphone",
+        "ipad",
+    ],
+    infoplists = ["Resources/iOS/Info.plist"],
+    minimum_os_version = "18.0",
+    deps = [":PartyGame_iOSMain"],
+)
+
+macos_application(
+    name = "PartyGame_macOS",
+    bundle_id = "com.sidekick.partygame.mac",
+    infoplists = ["Resources/macOS/Info.plist"],
+    minimum_os_version = "15.0",
+    deps = [":PartyGame_macOSMain"],
+)
+
+tvos_application(
+    name = "PartyGame_tvOS",
+    bundle_id = "com.sidekick.partygame.tv",
+    infoplists = ["Resources/tvOS/Info.plist"],
+    minimum_os_version = "18.0",
+    deps = [":PartyGame_tvOSMain"],
+)
+
+watchos_application(
+    name = "PartyGame_watchOS",
+    bundle_id = "com.sidekick.partygame.watch",
+    infoplists = ["Resources/watchOS/Info.plist"],
+    minimum_os_version = "11.0",
+    deps = [":PartyGame_watchOSMain"],
+)
