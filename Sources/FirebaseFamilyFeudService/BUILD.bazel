@@ -2,7 +2,10 @@ load("@rules_swift//swift:swift.bzl", "swift_library")
 
 swift_library(
     name = "FirebaseFamilyFeudService",
-    srcs = ["FirebaseFamilyFeudService.swift"],
+    srcs = [
+        "FirebaseFamilyFeudService.swift",
+        "FirebaseFamilyFeudServiceFactory.swift",
+    ],
     module_name = "FirebaseFamilyFeudService",
     deps = [
         "//Sources/FamilyFeudCore:FamilyFeudCore",
@@ -13,4 +16,23 @@ swift_library(
         "//Sources/FamilyFeudAppleApp:__pkg__",
         "//Tests/SideKickTests:__pkg__",
     ],
+)
+
+swift_library(
+    name = "FirebaseFamilyFeudServiceSDK",
+    srcs = [
+        "FirebaseFamilyFeudService.swift",
+        "FirebaseFamilyFeudServiceFactory.swift",
+    ],
+    module_name = "FirebaseFamilyFeudService",
+    tags = ["manual"],
+    deps = [
+        "//Sources/FamilyFeudCore:FamilyFeudCore",
+        "//Sources/FirebaseCoreService:FirebaseCoreService",
+        "//Sources/FirestoreDataService:FirestoreDataServiceSDK",
+        "@swiftpkg_firebase_ios_sdk//:FirebaseAuth",
+        "@swiftpkg_firebase_ios_sdk//:FirebaseCore",
+        "@swiftpkg_firebase_ios_sdk//:FirebaseFirestore",
+    ],
+    visibility = ["//visibility:public"],
 )

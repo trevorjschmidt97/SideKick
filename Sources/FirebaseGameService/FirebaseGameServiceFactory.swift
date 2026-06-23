@@ -9,13 +9,43 @@ import FirebaseFirestore
 #endif
 
 public enum FirebaseGameServiceFactory {
+    public static func makeLocalEmulatorService(
+        projectID: String = "demo-sidekick",
+        firestoreEmulatorHost: String = "localhost:8080",
+        authEmulatorHost: String = "localhost:9099",
+        database: Any? = nil
+    ) async throws(GameServiceError) -> any GameService {
+        try await makeAuthenticatedService(
+            configuration: FirebaseGameServiceConfiguration(
+                projectID: projectID,
+                emulatorHost: firestoreEmulatorHost,
+                authEmulatorHost: authEmulatorHost,
+                usesEmulator: true
+            ),
+            database: database,
+            allowsDemoOptions: true
+        )
+    }
+
     public static func makeAuthenticatedService(
         configuration: FirebaseGameServiceConfiguration,
         database: Any? = nil
     ) async throws(GameServiceError) -> any GameService {
+        try await makeAuthenticatedService(
+            configuration: configuration,
+            database: database,
+            allowsDemoOptions: false
+        )
+    }
+
+    private static func makeAuthenticatedService(
+        configuration: FirebaseGameServiceConfiguration,
+        database: Any?,
+        allowsDemoOptions: Bool
+    ) async throws(GameServiceError) -> any GameService {
         #if canImport(FirebaseAuth) && canImport(FirebaseCore) && canImport(FirebaseFirestore)
         if FirebaseApp.app() == nil {
-            FirebaseApp.configure()
+            configureFirebaseApp(configuration: configuration, allowsDemoOptions: allowsDemoOptions)
         }
         configureAuthEmulatorIfNeeded(configuration: configuration)
 
@@ -52,6 +82,25 @@ public enum FirebaseGameServiceFactory {
     }
 
     #if canImport(FirebaseAuth) && canImport(FirebaseCore) && canImport(FirebaseFirestore)
+    private static func configureFirebaseApp(
+        configuration: FirebaseGameServiceConfiguration,
+        allowsDemoOptions: Bool
+    ) {
+        if allowsDemoOptions {
+            let projectID = configuration.projectID ?? "demo-sidekick"
+            let options = FirebaseOptions(
+                googleAppID: "1:1234567890:ios:\(projectID.replacingOccurrences(of: "-", with: ""))",
+                gcmSenderID: "1234567890"
+            )
+            options.apiKey = "fake-api-key"
+            options.projectID = projectID
+            options.bundleID = Bundle.main.bundleIdentifier ?? "com.sidekick.local"
+            FirebaseApp.configure(options: options)
+        } else {
+            FirebaseApp.configure()
+        }
+    }
+
     private static func configureAuthEmulatorIfNeeded(configuration: FirebaseGameServiceConfiguration) {
         guard configuration.usesEmulator else {
             return

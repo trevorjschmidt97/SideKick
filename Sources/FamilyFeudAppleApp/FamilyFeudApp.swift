@@ -5,6 +5,7 @@ import FamilyFeudIntents
 import FamilyFeudManagers
 import FamilyFeudModules
 import FamilyFeudServices
+import FirebaseFamilyFeudService
 import SideKickAppCore
 
 public struct FamilyFeudBootstrapView: View {
@@ -24,9 +25,17 @@ public struct FamilyFeudBootstrapView: View {
             } else {
                 ProgressView()
                     .task {
-                        service = FakeLocalFamilyFeudService()
+                        service = await Self.makeDefaultService()
                     }
             }
+        }
+    }
+
+    private static func makeDefaultService() async -> any FamilyFeudService {
+        do {
+            return try await FirebaseFamilyFeudServiceFactory.makeLocalEmulatorService()
+        } catch {
+            return FakeLocalFamilyFeudService()
         }
     }
 }

@@ -16,6 +16,18 @@ swift_library(
 )
 
 swift_library(
+    name = "PartyGame_iOSMain_FirebaseLocal",
+    srcs = ["Sources/PartyGameIOSMain.swift"],
+    tags = ["manual"],
+    deps = [
+        "//Sources/GameServices:GameServices",
+        "//Sources/PartyGameAppCore:PartyGameAppCore",
+        "//Sources/PartyGameAppleApp:PartyGameAppleAppFirebaseLocal",
+        "//Sources/SideKickAppCore:SideKickAppCore",
+    ],
+)
+
+swift_library(
     name = "PartyGame_macOSMain",
     srcs = ["Sources/PartyGameMacMain.swift"],
     deps = [
@@ -58,6 +70,19 @@ ios_application(
     infoplists = ["Resources/iOS/Info.plist"],
     minimum_os_version = "18.0",
     deps = [":PartyGame_iOSMain"],
+)
+
+ios_application(
+    name = "PartyGame_iOS_FirebaseLocal",
+    bundle_id = "com.sidekick.partygame.local",
+    families = [
+        "iphone",
+        "ipad",
+    ],
+    infoplists = ["Resources/iOS/Info.plist"],
+    minimum_os_version = "18.0",
+    tags = ["manual"],
+    deps = [":PartyGame_iOSMain_FirebaseLocal"],
 )
 
 macos_application(

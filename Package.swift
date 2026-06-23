@@ -99,8 +99,19 @@ let package = Package(
         .target(name: "FamilyFeudIntents", dependencies: ["FamilyFeudCore", "FamilyFeudManagers"], exclude: ["BUILD.bazel"]),
         .target(name: "FamilyFeudModules", dependencies: ["FamilyFeudCore"], exclude: ["BUILD.bazel"]),
         .target(name: "FamilyFeudAppCore", dependencies: ["FamilyFeudCore", "SideKickAppCore"], exclude: ["BUILD.bazel"]),
-        .target(name: "FirebaseFamilyFeudService", dependencies: ["FamilyFeudCore", "FirebaseCoreService", "FirestoreDataService"], exclude: ["BUILD.bazel"]),
-        .target(name: "FamilyFeudAppleApp", dependencies: ["FamilyFeudAppCore", "FamilyFeudCore", "FamilyFeudIntents", "FamilyFeudManagers", "FamilyFeudModules", "FamilyFeudServices", "SideKickAppCore"], exclude: ["BUILD.bazel"]),
+        .target(
+            name: "FirebaseFamilyFeudService",
+            dependencies: [
+                "FamilyFeudCore",
+                "FirebaseCoreService",
+                "FirestoreDataService",
+                .product(name: "FirebaseAuth", package: "firebase-ios-sdk"),
+                .product(name: "FirebaseCore", package: "firebase-ios-sdk"),
+                .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
+            ],
+            exclude: ["BUILD.bazel"]
+        ),
+        .target(name: "FamilyFeudAppleApp", dependencies: ["FamilyFeudAppCore", "FamilyFeudCore", "FamilyFeudIntents", "FamilyFeudManagers", "FamilyFeudModules", "FamilyFeudServices", "FirebaseFamilyFeudService", "SideKickAppCore"], exclude: ["BUILD.bazel"]),
         .testTarget(name: "SideKickTests", dependencies: ["BoardGameModule", "FamilyFeudAppCore", "FamilyFeudAppleApp", "FamilyFeudCore", "FamilyFeudIntents", "FamilyFeudManagers", "FamilyFeudModules", "FamilyFeudServices", "FirebaseCoreService", "FirebaseFamilyFeudService", "FirebaseGameService", "FirestoreDataService", "GameCore", "GameEntryModule", "GameIntents", "GameModuleShared", "JoinGameModule", "GameManagers", "GameServices", "PartyGameAppCore", "SideKickAppCore", "PartyGameAppleApp"], exclude: ["BUILD.bazel"]),
     ]
 )

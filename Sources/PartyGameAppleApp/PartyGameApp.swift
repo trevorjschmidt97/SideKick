@@ -34,13 +34,17 @@ public struct PartyGameBootstrapView: View {
     }
 
     private static func makeDefaultService() async -> any GameService {
-        guard Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil else {
-            return FakeLocalGameService()
+        if Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil {
+            do {
+                return try await FirebaseGameServiceFactory.makeAuthenticatedService(
+                    configuration: FirebaseGameServiceConfiguration()
+                )
+            } catch {
+                return FakeLocalGameService()
+            }
         }
         do {
-            return try await FirebaseGameServiceFactory.makeAuthenticatedService(
-                configuration: FirebaseGameServiceConfiguration()
-            )
+            return try await FirebaseGameServiceFactory.makeLocalEmulatorService()
         } catch {
             return FakeLocalGameService()
         }

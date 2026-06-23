@@ -43,17 +43,41 @@ For local Firebase work, run Firestore and Auth emulators together:
 firebase emulators:start --only firestore,auth
 ```
 
-PartyGame app composition uses
-`FirebaseGameServiceFactory.makeAuthenticatedService` when
-`GoogleService-Info.plist` is present. That factory configures Firebase,
-performs anonymous Firebase Auth when needed, derives a
-`FirebaseGameServicePrincipal` from `Auth.auth().currentUser.uid`, configures
-emulators when requested, and returns `any GameService`.
+PartyGame app composition uses production Firebase when
+`GoogleService-Info.plist` is present. Without credentials, SDK-backed local
+Firebase builds use `FirebaseGameServiceFactory.makeLocalEmulatorService()` with
+demo Firebase options. That path configures Firebase, signs in anonymously
+through the Auth emulator, configures Firestore to use the local emulator, and
+returns `any GameService`.
 
-Family Feud currently has the Firebase adapter target and fake-local app
-composition. A production Family Feud Firebase factory should follow the same
-composition shape as PartyGame, using `FirebaseCoreService` plus
-`FirestoreSDKDocumentStore<FirebaseFamilyFeudRoomDocument>`.
+Family Feud uses `FirebaseFamilyFeudServiceFactory.makeLocalEmulatorService()`
+for SDK-backed local Firebase builds. It stores documents in
+`familyFeudRooms`.
+
+Normal Bazel app targets intentionally use SDK-optional Firebase service
+surfaces so `//...` stays lightweight. To run simulators against the local
+Firebase emulators, use the manual `*_FirebaseLocal` app targets.
+
+Start the local backend:
+
+```sh
+firebase emulators:start --only firestore,auth --project demo-sidekick
+```
+
+Then run as many simulators as you want against the same local backend:
+
+```sh
+npx --yes @bazel/bazelisk run \
+  //Apps/PartyGame/Apple:PartyGame_iOS_FirebaseLocal \
+  --ios_simulator_device="iPhone 16"
+
+npx --yes @bazel/bazelisk run \
+  //Apps/FamilyFeud/Apple:FamilyFeud_iOS_FirebaseLocal \
+  --ios_simulator_device="iPhone 16"
+```
+
+If the emulator is not running, app bootstraps fall back to fake local services
+so the UI still opens. Multiple fake-service app instances do not share state.
 
 ## Firestore Shape
 
@@ -65,11 +89,9 @@ PartyGame first-slice collections:
 
 Family Feud first-slice documents:
 
-- `familyFeudRooms/{roomID}` or another app-owned collection name when the
-  production factory is added. Documents should contain `id`, `joinCode`,
-  `hostID`, primitive `playerIDs`, primitive `teamIDs`, `board`, embedded
-  `players`, embedded `teams`, `phase`, `activeQuestionID`, and
-  `currentRoundIndex`.
+- `familyFeudRooms/{roomID}`: documents contain `id`, `joinCode`, `hostID`,
+  primitive `playerIDs`, primitive `teamIDs`, `board`, embedded `players`,
+  embedded `teams`, `phase`, `activeQuestionID`, and `currentRoundIndex`.
 
 Top-level Firestore ID fields should be primitive strings, not encoded wrapper
 objects. Feature document types expose `primitiveFieldValues` for scalar lookup
@@ -111,7 +133,8 @@ Bazel owns the internal graph:
 ```sh
 npx --yes @bazel/bazelisk build \
   //Sources/FirestoreDataService:FirestoreDataServiceSDK \
-  //Sources/FirebaseGameService:FirebaseGameServiceSDK
+  //Sources/FirebaseGameService:FirebaseGameServiceSDK \
+  //Sources/FirebaseFamilyFeudService:FirebaseFamilyFeudServiceSDK
 ```
 
 ## Security Rules
@@ -129,10 +152,11 @@ Initial rules currently cover the PartyGame `rooms` shape:
   `firstBuzzedPlayerID == request.auth.uid`.
 - Clients cannot write Firebase SDK-specific fields into SideKick model data.
 
-The rules do not yet include the Family Feud collection shape or validate every
-nested field/game-rule transition. The Swift services remain the source of
-game-rule transitions, and emulator tests should cover representative allow and
-deny cases before production rollout.
+The rules include the first Family Feud collection shape and basic authenticated
+host/join constraints, but they do not yet validate every nested field or every
+game-rule transition. The Swift services remain the source of game-rule
+transitions, and emulator tests should cover representative allow and deny cases
+before production rollout.
 
 ## Validation
 
@@ -143,7 +167,8 @@ swift test
 npx --yes @bazel/bazelisk test //...
 npx --yes @bazel/bazelisk build \
   //Sources/FirestoreDataService:FirestoreDataServiceSDK \
-  //Sources/FirebaseGameService:FirebaseGameServiceSDK
+  //Sources/FirebaseGameService:FirebaseGameServiceSDK \
+  //Sources/FirebaseFamilyFeudService:FirebaseFamilyFeudServiceSDK
 firebase emulators:exec --only firestore,auth --project demo-sidekick "true"
 ```
 

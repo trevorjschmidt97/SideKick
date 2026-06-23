@@ -21,3 +21,25 @@ swift_library(
         "//Tests/SideKickTests:__pkg__",
     ],
 )
+
+swift_library(
+    name = "PartyGameAppleAppFirebaseLocal",
+    srcs = ["PartyGameApp.swift"],
+    module_name = "PartyGameAppleApp",
+    tags = ["manual"],
+    deps = [
+        "//Sources/FirebaseGameService:FirebaseGameServiceSDK",
+        "//Sources/GameCore:GameCore",
+        "//Sources/GameIntents:GameIntents",
+        "//Sources/GameModules:BoardGameModule",
+        "//Sources/GameModules:GameEntryModule",
+        "//Sources/GameModules:JoinGameModule",
+        "//Sources/GameManagers:GameManagers",
+        "//Sources/GameServices:GameServices",
+        "//Sources/PartyGameAppCore:PartyGameAppCore",
+        "//Sources/SideKickAppCore:SideKickAppCore",
+    ],
+    visibility = [
+        "//Apps/PartyGame/Apple:__pkg__",
+    ],
+)
