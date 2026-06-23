@@ -1,5 +1,5 @@
 public enum GameModuleStrings {
-    public static let title = "SideKick Party"
+    public static let title = "SideKick Jeopardy"
     public static let gameBoard = "Game Board"
     public static let joinGame = "Join a Game"
     public static let createGameBoard = "Create Game Board"

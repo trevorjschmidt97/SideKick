@@ -1,12 +1,12 @@
 import SwiftUI
-import PartyGameAppleApp
+import JeopardyAppleApp
 import SideKickAppCore
 
 @main
-struct PartyGameMacMain: App {
+struct JeopardyMacMain: App {
     var body: some Scene {
         WindowGroup {
-            PartyGameBootstrapView(platform: .mac)
+            JeopardyBootstrapView(platform: .mac)
         }
     }
 }

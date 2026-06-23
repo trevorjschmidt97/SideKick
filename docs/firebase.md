@@ -11,13 +11,13 @@ inside Firebase/service adapter targets.
 - `FirestoreDataService`: shared generic Firestore document infrastructure:
   `FirestoreDocument`, `FirestoreDocumentStore`, `InMemoryFirestoreDocumentStore`,
   `AnyFirestoreDocumentStore`, and conditional `FirestoreSDKDocumentStore`.
-- `FirebaseGameService`: PartyGame adapter. It maps `GameCore` models and
+- `FirebaseGameService`: Jeopardy adapter. It maps `GameCore` models and
   `GameServiceError` onto generic Firestore document operations.
 - `FirebaseFamilyFeudService`: Family Feud adapter. It maps `FamilyFeudCore`
   models and `FamilyFeudServiceError` onto generic Firestore document operations.
 
 Feature cores do not import Firebase SDKs. Shared Firestore infrastructure does
-not know about PartyGame or Family Feud errors.
+not know about Jeopardy or Family Feud errors.
 
 ## Config Files
 
@@ -34,7 +34,7 @@ modules, or shared app-core targets.
 The current app containers default to fake local services when Firebase
 credentials are absent:
 
-- PartyGame: `FakeLocalGameService`
+- Jeopardy: `FakeLocalGameService`
 - Family Feud: `FakeLocalFamilyFeudService`
 
 For production-like Firebase rule work, run Firestore and Auth emulators
@@ -44,7 +44,7 @@ together:
 firebase emulators:start --only firestore,auth
 ```
 
-PartyGame app composition uses production Firebase when
+Jeopardy app composition uses production Firebase when
 `GoogleService-Info.plist` is present. Without credentials, SDK-backed local
 Firebase builds use `FirebaseGameServiceFactory.makeLocalEmulatorService()` with
 demo Firebase options. That path configures Firebase, uses a stable local
@@ -75,7 +75,7 @@ Then run as many simulators as you want against the same local backend:
 
 ```sh
 npx --yes @bazel/bazelisk run \
-  //Apps/PartyGame/Apple:PartyGame_iOS_FirebaseLocal \
+  //Apps/Jeopardy/Apple:Jeopardy_iOS_FirebaseLocal \
   --ios_simulator_device="iPhone 16"
 
 npx --yes @bazel/bazelisk run \
@@ -88,7 +88,7 @@ so the UI still opens. Multiple fake-service app instances do not share state.
 
 ## Firestore Shape
 
-PartyGame first-slice collections:
+Jeopardy first-slice collections:
 
 - `rooms/{roomID}`: flat room document with `id`, `joinCode`, `hostID`,
   primitive `playerIDs`, `board`, embedded `players`, `phase`,
@@ -111,7 +111,7 @@ rules should enforce the same authority checks that the Swift services enforce.
 Firestore mutations that update game state should use a transaction or a single
 generic `mutateDocument` operation. This matters for:
 
-- PartyGame first-buzz correctness.
+- Jeopardy first-buzz correctness.
 - Family Feud atomic team assignment on start.
 - Family Feud answer reveal and score updates.
 
@@ -146,7 +146,7 @@ npx --yes @bazel/bazelisk build \
 
 ## Security Rules
 
-Initial rules currently cover the PartyGame `rooms` shape:
+Initial rules currently cover the Jeopardy `rooms` shape:
 
 - A signed-in host can create a waiting room only for its own `hostID` and with
   no initial players.
@@ -181,6 +181,6 @@ firebase emulators:exec --only firestore,auth --project demo-sidekick "true"
 
 ## Indexes
 
-The current PartyGame lookup path uses room IDs and `joinCode` equality lookups,
+The current Jeopardy lookup path uses room IDs and `joinCode` equality lookups,
 so no composite index is required. Add indexes only when list/query screens or
 multi-field filters are introduced.

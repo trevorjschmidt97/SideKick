@@ -5,12 +5,12 @@ swift_library(
     srcs = ["PlatformRoles.swift"],
     module_name = "SideKickAppCore",
     visibility = [
-        "//Apps/PartyGame/Apple:__pkg__",
+        "//Apps/Jeopardy/Apple:__pkg__",
         "//Apps/FamilyFeud/Apple:__pkg__",
         "//Sources/FamilyFeudAppCore:__pkg__",
         "//Sources/FamilyFeudAppleApp:__pkg__",
-        "//Sources/PartyGameAppCore:__pkg__",
-        "//Sources/PartyGameAppleApp:__pkg__",
+        "//Sources/JeopardyAppCore:__pkg__",
+        "//Sources/JeopardyAppleApp:__pkg__",
         "//Tests/SideKickTests:__pkg__",
     ],
 )

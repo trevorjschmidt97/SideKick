@@ -1,5 +1,5 @@
 import XCTest
-@testable import PartyGameAppCore
+@testable import JeopardyAppCore
 import SideKickAppCore
 
 @MainActor

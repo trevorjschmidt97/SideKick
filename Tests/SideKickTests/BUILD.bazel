@@ -24,8 +24,8 @@ swift_test(
         "//Sources/GameModules:JoinGameModule",
         "//Sources/GameManagers:GameManagers",
         "//Sources/GameServices:GameServices",
-        "//Sources/PartyGameAppCore:PartyGameAppCore",
-        "//Sources/PartyGameAppleApp:PartyGameAppleApp",
+        "//Sources/JeopardyAppCore:JeopardyAppCore",
+        "//Sources/JeopardyAppleApp:JeopardyAppleApp",
         "//Sources/SideKickAppCore:SideKickAppCore",
     ],
 )

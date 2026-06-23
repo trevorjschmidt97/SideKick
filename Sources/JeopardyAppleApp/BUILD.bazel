@@ -1,9 +1,9 @@
 load("@rules_swift//swift:swift.bzl", "swift_library")
 
 swift_library(
-    name = "PartyGameAppleApp",
-    srcs = ["PartyGameApp.swift"],
-    module_name = "PartyGameAppleApp",
+    name = "JeopardyAppleApp",
+    srcs = ["JeopardyApp.swift"],
+    module_name = "JeopardyAppleApp",
     deps = [
         "//Sources/FirebaseGameService:FirebaseGameService",
         "//Sources/GameCore:GameCore",
@@ -13,19 +13,19 @@ swift_library(
         "//Sources/GameModules:JoinGameModule",
         "//Sources/GameManagers:GameManagers",
         "//Sources/GameServices:GameServices",
-        "//Sources/PartyGameAppCore:PartyGameAppCore",
+        "//Sources/JeopardyAppCore:JeopardyAppCore",
         "//Sources/SideKickAppCore:SideKickAppCore",
     ],
     visibility = [
-        "//Apps/PartyGame/Apple:__pkg__",
+        "//Apps/Jeopardy/Apple:__pkg__",
         "//Tests/SideKickTests:__pkg__",
     ],
 )
 
 swift_library(
-    name = "PartyGameAppleAppFirebaseLocal",
-    srcs = ["PartyGameApp.swift"],
-    module_name = "PartyGameAppleApp",
+    name = "JeopardyAppleAppFirebaseLocal",
+    srcs = ["JeopardyApp.swift"],
+    module_name = "JeopardyAppleApp",
     tags = ["manual"],
     deps = [
         "//Sources/FirebaseGameService:FirebaseGameServiceSDK",
@@ -36,10 +36,10 @@ swift_library(
         "//Sources/GameModules:JoinGameModule",
         "//Sources/GameManagers:GameManagers",
         "//Sources/GameServices:GameServices",
-        "//Sources/PartyGameAppCore:PartyGameAppCore",
+        "//Sources/JeopardyAppCore:JeopardyAppCore",
         "//Sources/SideKickAppCore:SideKickAppCore",
     ],
     visibility = [
-        "//Apps/PartyGame/Apple:__pkg__",
+        "//Apps/Jeopardy/Apple:__pkg__",
     ],
 )

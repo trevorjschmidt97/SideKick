@@ -1,14 +1,14 @@
 import SwiftUI
 import GameCore
-import PartyGameAppCore
-import PartyGameAppleApp
+import JeopardyAppCore
+import JeopardyAppleApp
 import SideKickAppCore
 
 @main
-struct PartyGameIOSMain: App {
+struct JeopardyIOSMain: App {
     var body: some Scene {
         WindowGroup {
-            PartyGameBootstrapView(
+            JeopardyBootstrapView(
                 platform: .iPhone,
                 initialRole: Self.launchRole,
                 launchJoin: Self.launchJoin
@@ -17,17 +17,17 @@ struct PartyGameIOSMain: App {
     }
 
     private static var launchRole: GameRole? {
-        value(after: "--sidekick-party-game-role").flatMap(GameRole.init(rawValue:))
+        value(after: "--sidekick-jeopardy-role").flatMap(GameRole.init(rawValue:))
     }
 
-    private static var launchJoin: PartyGameLaunchJoin? {
+    private static var launchJoin: JeopardyLaunchJoin? {
         guard
-            let code = value(after: "--sidekick-party-game-join-code"),
-            let displayName = value(after: "--sidekick-party-game-display-name")
+            let code = value(after: "--sidekick-jeopardy-join-code"),
+            let displayName = value(after: "--sidekick-jeopardy-display-name")
         else {
             return nil
         }
-        return PartyGameLaunchJoin(joinCode: JoinCode(rawValue: code), displayName: displayName)
+        return JeopardyLaunchJoin(joinCode: JoinCode(rawValue: code), displayName: displayName)
     }
 
     private static func value(after flag: String) -> String? {

@@ -6,7 +6,7 @@ swift_library(
     module_name = "GameManagers",
     deps = ["//Sources/GameCore:GameCore"],
     visibility = [
-        "//Sources/PartyGameAppleApp:__pkg__",
+        "//Sources/JeopardyAppleApp:__pkg__",
         "//Tests/SideKickTests:__pkg__",
     ],
 )

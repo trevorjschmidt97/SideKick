@@ -7,16 +7,16 @@ import GameIntents
 import GameManagers
 import GameServices
 import JoinGameModule
-import PartyGameAppCore
+import JeopardyAppCore
 import SideKickAppCore
 
-public struct PartyGameBootstrapView: View {
+public struct JeopardyBootstrapView: View {
     private let platform: SideKickPlatform
     private let initialRole: GameRole?
-    private let launchJoin: PartyGameLaunchJoin?
+    private let launchJoin: JeopardyLaunchJoin?
     @State private var service: (any GameService)?
 
-    public init(platform: SideKickPlatform, initialRole: GameRole? = nil, launchJoin: PartyGameLaunchJoin? = nil) {
+    public init(platform: SideKickPlatform, initialRole: GameRole? = nil, launchJoin: JeopardyLaunchJoin? = nil) {
         self.platform = platform
         self.initialRole = initialRole
         self.launchJoin = launchJoin
@@ -25,7 +25,7 @@ public struct PartyGameBootstrapView: View {
     public var body: some View {
         Group {
             if let service {
-                PartyGameRootView(platform: platform, service: service, initialRole: initialRole, launchJoin: launchJoin)
+                JeopardyRootView(platform: platform, service: service, initialRole: initialRole, launchJoin: launchJoin)
             } else {
                 ProgressView()
                     .task {
@@ -53,17 +53,17 @@ public struct PartyGameBootstrapView: View {
     }
 }
 
-public struct PartyGameRootView: View {
+public struct JeopardyRootView: View {
     @State private var gameManager: GameManager
     @State private var navigationStore: AppNavigationStore
     private let initialRole: GameRole?
-    private let launchJoin: PartyGameLaunchJoin?
+    private let launchJoin: JeopardyLaunchJoin?
 
     public init(
         platform: SideKickPlatform,
         service: any GameService,
         initialRole: GameRole? = nil,
-        launchJoin: PartyGameLaunchJoin? = nil
+        launchJoin: JeopardyLaunchJoin? = nil
     ) {
         _gameManager = State(initialValue: GameManager(service: service))
         _navigationStore = State(initialValue: AppNavigationStore(platform: platform))
@@ -84,7 +84,7 @@ public struct PartyGameRootView: View {
 struct GameRootView: View {
     @State var gameManager: GameManager
     @State var navigationStore: AppNavigationStore
-    var launchJoin: PartyGameLaunchJoin?
+    var launchJoin: JeopardyLaunchJoin?
 
     var body: some View {
         NavigationStack {
@@ -149,7 +149,7 @@ struct GameRootView: View {
     }
 }
 
-public struct PartyGameLaunchJoin: Sendable {
+public struct JeopardyLaunchJoin: Sendable {
     public var joinCode: JoinCode
     public var displayName: String
 

@@ -23,8 +23,8 @@ let package = Package(
         .library(name: "FirestoreDataService", targets: ["FirestoreDataService"]),
         .library(name: "FirebaseGameService", targets: ["FirebaseGameService"]),
         .library(name: "SideKickAppCore", targets: ["SideKickAppCore"]),
-        .library(name: "PartyGameAppCore", targets: ["PartyGameAppCore"]),
-        .library(name: "PartyGameAppleApp", targets: ["PartyGameAppleApp"]),
+        .library(name: "JeopardyAppCore", targets: ["JeopardyAppCore"]),
+        .library(name: "JeopardyAppleApp", targets: ["JeopardyAppleApp"]),
         .library(name: "FamilyFeudCore", targets: ["FamilyFeudCore"]),
         .library(name: "FamilyFeudServices", targets: ["FamilyFeudServices"]),
         .library(name: "FamilyFeudManagers", targets: ["FamilyFeudManagers"]),
@@ -91,8 +91,8 @@ let package = Package(
             exclude: ["BUILD.bazel"]
         ),
         .target(name: "SideKickAppCore", exclude: ["BUILD.bazel"]),
-        .target(name: "PartyGameAppCore", dependencies: ["GameCore", "SideKickAppCore"], exclude: ["BUILD.bazel"]),
-        .target(name: "PartyGameAppleApp", dependencies: ["BoardGameModule", "FirebaseGameService", "GameCore", "GameEntryModule", "GameIntents", "GameServices", "JoinGameModule", "GameManagers", "PartyGameAppCore", "SideKickAppCore"], exclude: ["BUILD.bazel"]),
+        .target(name: "JeopardyAppCore", dependencies: ["GameCore", "SideKickAppCore"], exclude: ["BUILD.bazel"]),
+        .target(name: "JeopardyAppleApp", dependencies: ["BoardGameModule", "FirebaseGameService", "GameCore", "GameEntryModule", "GameIntents", "GameServices", "JoinGameModule", "GameManagers", "JeopardyAppCore", "SideKickAppCore"], exclude: ["BUILD.bazel"]),
         .target(name: "FamilyFeudCore", exclude: ["BUILD.bazel"]),
         .target(name: "FamilyFeudServices", dependencies: ["FamilyFeudCore"], exclude: ["BUILD.bazel"]),
         .target(name: "FamilyFeudManagers", dependencies: ["FamilyFeudCore"], exclude: ["BUILD.bazel"]),
@@ -112,6 +112,6 @@ let package = Package(
             exclude: ["BUILD.bazel"]
         ),
         .target(name: "FamilyFeudAppleApp", dependencies: ["FamilyFeudAppCore", "FamilyFeudCore", "FamilyFeudIntents", "FamilyFeudManagers", "FamilyFeudModules", "FamilyFeudServices", "FirebaseFamilyFeudService", "SideKickAppCore"], exclude: ["BUILD.bazel"]),
-        .testTarget(name: "SideKickTests", dependencies: ["BoardGameModule", "FamilyFeudAppCore", "FamilyFeudAppleApp", "FamilyFeudCore", "FamilyFeudIntents", "FamilyFeudManagers", "FamilyFeudModules", "FamilyFeudServices", "FirebaseCoreService", "FirebaseFamilyFeudService", "FirebaseGameService", "FirestoreDataService", "GameCore", "GameEntryModule", "GameIntents", "GameModuleShared", "JoinGameModule", "GameManagers", "GameServices", "PartyGameAppCore", "SideKickAppCore", "PartyGameAppleApp"], exclude: ["BUILD.bazel"]),
+        .testTarget(name: "SideKickTests", dependencies: ["BoardGameModule", "FamilyFeudAppCore", "FamilyFeudAppleApp", "FamilyFeudCore", "FamilyFeudIntents", "FamilyFeudManagers", "FamilyFeudModules", "FamilyFeudServices", "FirebaseCoreService", "FirebaseFamilyFeudService", "FirebaseGameService", "FirestoreDataService", "GameCore", "GameEntryModule", "GameIntents", "GameModuleShared", "JoinGameModule", "GameManagers", "GameServices", "JeopardyAppCore", "SideKickAppCore", "JeopardyAppleApp"], exclude: ["BUILD.bazel"]),
     ]
 )

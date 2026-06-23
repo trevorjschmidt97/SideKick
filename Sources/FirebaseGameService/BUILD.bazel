@@ -14,8 +14,8 @@ swift_library(
         "//Sources/GameCore:GameCore",
     ],
     visibility = [
-        "//Apps/PartyGame/Apple:__pkg__",
-        "//Sources/PartyGameAppleApp:__pkg__",
+        "//Apps/Jeopardy/Apple:__pkg__",
+        "//Sources/JeopardyAppleApp:__pkg__",
         "//Tests/SideKickTests:__pkg__",
     ],
 )

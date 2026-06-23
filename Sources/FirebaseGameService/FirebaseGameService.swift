@@ -175,7 +175,7 @@ public actor InMemoryFirebaseGameDocumentStore: FirebaseGameDocumentStore {
                 switch operation(document.room) {
                 case .failure(let error):
                     featureError = error
-                    return .failure(.backendUnavailable("PartyGame mutation rejected."))
+                    return .failure(.backendUnavailable("Jeopardy mutation rejected."))
                 case .success(.updated(let room)):
                     return .success(FirebaseGameRoomDocument(room: room))
                 }
@@ -231,7 +231,7 @@ public actor GenericFirebaseGameDocumentStore: FirebaseGameDocumentStore {
                 switch operation(document.room) {
                 case .failure(let error):
                     featureError = error
-                    return .failure(.backendUnavailable("PartyGame mutation rejected."))
+                    return .failure(.backendUnavailable("Jeopardy mutation rejected."))
                 case .success(.updated(let room)):
                     return .success(FirebaseGameRoomDocument(room: room))
                 }

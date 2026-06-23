@@ -26,7 +26,7 @@ swift_library(
         "//Sources/GameCore:GameCore",
     ],
     visibility = [
-        "//Sources/PartyGameAppleApp:__pkg__",
+        "//Sources/JeopardyAppleApp:__pkg__",
         "//Tests/SideKickTests:__pkg__",
     ],
 )
@@ -42,7 +42,7 @@ swift_library(
         "//Sources/GameCore:GameCore",
     ],
     visibility = [
-        "//Sources/PartyGameAppleApp:__pkg__",
+        "//Sources/JeopardyAppleApp:__pkg__",
         "//Tests/SideKickTests:__pkg__",
     ],
 )
@@ -58,7 +58,7 @@ swift_library(
         "//Sources/GameCore:GameCore",
     ],
     visibility = [
-        "//Sources/PartyGameAppleApp:__pkg__",
+        "//Sources/JeopardyAppleApp:__pkg__",
         "//Tests/SideKickTests:__pkg__",
     ],
 )

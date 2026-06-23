@@ -1,4 +1,4 @@
-# PartyGame Android Target
+# Jeopardy Android Target
 
 Android is intentionally documented as next work for this first Swift vertical
 slice. The shared architecture already models Android as a supported platform in

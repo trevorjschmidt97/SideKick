@@ -1,15 +1,15 @@
 import Foundation
 import SideKickAppCore
 
-public enum PartyGameRole: String, Codable, Hashable, Sendable {
+public enum JeopardyRole: String, Codable, Hashable, Sendable {
     case board
     case join
 }
 
-public struct PartyGamePlatformRolePolicy: Sendable {
+public struct JeopardyPlatformRolePolicy: Sendable {
     public init() {}
 
-    public func allowedRoles(on platform: SideKickPlatform) -> Set<PartyGameRole> {
+    public func allowedRoles(on platform: SideKickPlatform) -> Set<JeopardyRole> {
         switch platform {
         case .appleTV:
             return [.board]
@@ -20,11 +20,11 @@ public struct PartyGamePlatformRolePolicy: Sendable {
         }
     }
 
-    public func canUse(_ role: PartyGameRole, on platform: SideKickPlatform) -> Bool {
+    public func canUse(_ role: JeopardyRole, on platform: SideKickPlatform) -> Bool {
         allowedRoles(on: platform).contains(role)
     }
 
-    public func defaultRoot(on platform: SideKickPlatform) -> PartyGameRootTree {
+    public func defaultRoot(on platform: SideKickPlatform) -> JeopardyRootTree {
         switch platform {
         case .appleTV:
             return .board
@@ -35,7 +35,7 @@ public struct PartyGamePlatformRolePolicy: Sendable {
         }
     }
 
-    public func isStateAllowed(_ state: PartyGameEncodedNavigationState, on platform: SideKickPlatform) -> Bool {
+    public func isStateAllowed(_ state: JeopardyEncodedNavigationState, on platform: SideKickPlatform) -> Bool {
         guard state.presentedRoute.map({ isPresentedRoute($0, allowedIn: state.root) }) ?? true else {
             return false
         }
@@ -61,7 +61,7 @@ public struct PartyGamePlatformRolePolicy: Sendable {
         }
     }
 
-    private func isPresentedRoute(_ route: PartyGameRoute, allowedIn root: PartyGameRootTree) -> Bool {
+    private func isPresentedRoute(_ route: JeopardyRoute, allowedIn root: JeopardyRootTree) -> Bool {
         switch root {
         case .board, .player:
             if case .devSettings = route { return true }
@@ -72,5 +72,5 @@ public struct PartyGamePlatformRolePolicy: Sendable {
     }
 }
 
-public typealias GameRole = PartyGameRole
-public typealias PlatformRolePolicy = PartyGamePlatformRolePolicy
+public typealias GameRole = JeopardyRole
+public typealias PlatformRolePolicy = JeopardyPlatformRolePolicy
