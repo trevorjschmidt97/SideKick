@@ -2,15 +2,14 @@ load("@rules_swift//swift:swift.bzl", "swift_library")
 
 swift_library(
     name = "SideKickAppCore",
-    srcs = [
-        "AppNavigationStore.swift",
-        "GameRoutes.swift",
-        "PlatformRoles.swift",
-    ],
+    srcs = ["PlatformRoles.swift"],
     module_name = "SideKickAppCore",
-    deps = ["//Sources/GameCore:GameCore"],
     visibility = [
         "//Apps/PartyGame/Apple:__pkg__",
+        "//Apps/FamilyFeud/Apple:__pkg__",
+        "//Sources/FamilyFeudAppCore:__pkg__",
+        "//Sources/FamilyFeudAppleApp:__pkg__",
+        "//Sources/PartyGameAppCore:__pkg__",
         "//Sources/PartyGameAppleApp:__pkg__",
         "//Tests/SideKickTests:__pkg__",
     ],

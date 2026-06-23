@@ -7,6 +7,7 @@ import GameIntents
 import GameManagers
 import GameServices
 import JoinGameModule
+import PartyGameAppCore
 import SideKickAppCore
 
 public struct PartyGameBootstrapView: View {

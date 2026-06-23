@@ -8,7 +8,11 @@ swift_library(
         "FirestoreGameDocumentStore.swift",
     ],
     module_name = "FirebaseGameService",
-    deps = ["//Sources/GameCore:GameCore"],
+    deps = [
+        "//Sources/FirebaseCoreService:FirebaseCoreService",
+        "//Sources/FirestoreDataService:FirestoreDataService",
+        "//Sources/GameCore:GameCore",
+    ],
     visibility = [
         "//Apps/PartyGame/Apple:__pkg__",
         "//Sources/PartyGameAppleApp:__pkg__",
@@ -26,6 +30,8 @@ swift_library(
     module_name = "FirebaseGameService",
     tags = ["manual"],
     deps = [
+        "//Sources/FirebaseCoreService:FirebaseCoreService",
+        "//Sources/FirestoreDataService:FirestoreDataServiceSDK",
         "//Sources/GameCore:GameCore",
         "@swiftpkg_firebase_ios_sdk//:FirebaseAuth",
         "@swiftpkg_firebase_ios_sdk//:FirebaseCore",

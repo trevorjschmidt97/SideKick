@@ -1,4 +1,5 @@
 import SwiftUI
+import PartyGameAppCore
 import PartyGameAppleApp
 import SideKickAppCore
 

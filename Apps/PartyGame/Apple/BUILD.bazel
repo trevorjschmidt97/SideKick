@@ -9,6 +9,7 @@ swift_library(
     srcs = ["Sources/PartyGameIOSMain.swift"],
     deps = [
         "//Sources/GameServices:GameServices",
+        "//Sources/PartyGameAppCore:PartyGameAppCore",
         "//Sources/PartyGameAppleApp:PartyGameAppleApp",
         "//Sources/SideKickAppCore:SideKickAppCore",
     ],
@@ -19,6 +20,7 @@ swift_library(
     srcs = ["Sources/PartyGameMacMain.swift"],
     deps = [
         "//Sources/GameServices:GameServices",
+        "//Sources/PartyGameAppCore:PartyGameAppCore",
         "//Sources/PartyGameAppleApp:PartyGameAppleApp",
         "//Sources/SideKickAppCore:SideKickAppCore",
     ],
@@ -29,6 +31,7 @@ swift_library(
     srcs = ["Sources/PartyGameTVMain.swift"],
     deps = [
         "//Sources/GameServices:GameServices",
+        "//Sources/PartyGameAppCore:PartyGameAppCore",
         "//Sources/PartyGameAppleApp:PartyGameAppleApp",
         "//Sources/SideKickAppCore:SideKickAppCore",
     ],
@@ -39,6 +42,7 @@ swift_library(
     srcs = ["Sources/PartyGameWatchMain.swift"],
     deps = [
         "//Sources/GameServices:GameServices",
+        "//Sources/PartyGameAppCore:PartyGameAppCore",
         "//Sources/PartyGameAppleApp:PartyGameAppleApp",
         "//Sources/SideKickAppCore:SideKickAppCore",
     ],

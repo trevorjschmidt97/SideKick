@@ -1,5 +1,6 @@
 import XCTest
-@testable import SideKickAppCore
+@testable import PartyGameAppCore
+import SideKickAppCore
 
 @MainActor
 final class NavigationAndPlatformTests: XCTestCase {

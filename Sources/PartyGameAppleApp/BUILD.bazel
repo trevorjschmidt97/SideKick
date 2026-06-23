@@ -13,6 +13,7 @@ swift_library(
         "//Sources/GameModules:JoinGameModule",
         "//Sources/GameManagers:GameManagers",
         "//Sources/GameServices:GameServices",
+        "//Sources/PartyGameAppCore:PartyGameAppCore",
         "//Sources/SideKickAppCore:SideKickAppCore",
     ],
     visibility = [

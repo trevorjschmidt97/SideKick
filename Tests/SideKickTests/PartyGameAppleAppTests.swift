@@ -1,6 +1,7 @@
 import XCTest
 import SwiftUI
 import GameServices
+import PartyGameAppCore
 import PartyGameAppleApp
 import SideKickAppCore
 

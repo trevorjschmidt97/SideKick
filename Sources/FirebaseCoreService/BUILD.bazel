@@ -1,0 +1,11 @@
+load("@rules_swift//swift:swift.bzl", "swift_library")
+
+swift_library(
+    name = "FirebaseCoreService",
+    srcs = ["FirebaseCoreService.swift"],
+    module_name = "FirebaseCoreService",
+    visibility = [
+        "//:sidekick_packages",
+        "//Tests/SideKickTests:__pkg__",
+    ],
+)

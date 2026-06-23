@@ -1,4 +1,5 @@
 import Foundation
+import FirestoreDataService
 import GameCore
 
 #if canImport(FirebaseAuth) && canImport(FirebaseCore) && canImport(FirebaseFirestore)
@@ -40,7 +41,9 @@ public enum FirebaseGameServiceFactory {
         return FirebaseGameService(
             configuration: configuration,
             principal: FirebaseGameServicePrincipal(userID: authUser.uid),
-            store: FirestoreGameDocumentStore(database: firestore)
+            store: GenericFirebaseGameDocumentStore(
+                store: FirestoreSDKDocumentStore<FirebaseGameRoomDocument>(collection: firestore.collection("rooms"))
+            )
         )
         #else
         _ = database

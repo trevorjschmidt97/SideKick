@@ -1,4 +1,6 @@
 import Foundation
+import FirebaseCoreService
+import FirestoreDataService
 import GameCore
 
 public struct FirebaseGameServiceConfiguration: Codable, Hashable, Sendable {
@@ -36,7 +38,7 @@ public struct FirebaseGameServicePrincipal: Codable, Hashable, Sendable {
     }
 }
 
-public struct FirebaseGameRoomDocument: Codable, Equatable, Sendable {
+public struct FirebaseGameRoomDocument: FirestoreDocument {
     public var id: RoomID
     public var joinCode: JoinCode
     public var hostID: HostID
@@ -130,53 +132,140 @@ public protocol FirebaseGameDocumentStore: Sendable {
 }
 
 public actor InMemoryFirebaseGameDocumentStore: FirebaseGameDocumentStore {
-    private var roomsByID: [RoomID: FirebaseGameRoomDocument]
-    private var roomIDsByJoinCode: [JoinCode: RoomID]
+    private let store: InMemoryFirestoreDocumentStore<FirebaseGameRoomDocument>
 
     public init(documents: [FirebaseGameRoomDocument] = []) {
-        self.roomsByID = Dictionary(uniqueKeysWithValues: documents.map { ($0.room.id, $0) })
-        self.roomIDsByJoinCode = Dictionary(uniqueKeysWithValues: documents.map { ($0.room.joinCode, $0.room.id) })
+        self.store = InMemoryFirestoreDocumentStore(documents: documents)
     }
 
     public func roomDocument(roomID: RoomID) async throws(GameServiceError) -> FirebaseGameRoomDocument? {
-        roomsByID[roomID]
+        try await mapStoreError {
+            try await store.document(id: roomID)
+        }
     }
 
     public func roomDocument(joinCode: JoinCode) async throws(GameServiceError) -> FirebaseGameRoomDocument? {
-        guard let roomID = roomIDsByJoinCode[joinCode] else {
-            return nil
+        try await mapStoreError {
+            try await store.firstDocument(where: "joinCode", equals: joinCode.rawValue)
         }
-        return roomsByID[roomID]
     }
 
     public func saveRoomDocument(_ document: FirebaseGameRoomDocument) async throws(GameServiceError) {
-        roomsByID[document.room.id] = document
-        roomIDsByJoinCode[document.room.joinCode] = document.room.id
+        try await mapStoreError {
+            try await store.saveDocument(document)
+        }
     }
 
     public func createRoomDocument(_ document: FirebaseGameRoomDocument) async throws(GameServiceError) {
-        guard roomIDsByJoinCode[document.room.joinCode] == nil else {
-            throw .joinCodeUnavailable
+        try await mapStoreError {
+            if try await store.firstDocument(where: "joinCode", equals: document.joinCode.rawValue) != nil {
+                throw FirestoreDataServiceError.documentAlreadyExists
+            }
+            try await store.createDocument(document)
         }
-        try await saveRoomDocument(document)
     }
 
     public func mutateRoomDocument(
         roomID: RoomID,
         operation: @escaping @Sendable (GameRoom) -> Result<FirebaseGameMutationResult, GameServiceError>
     ) async throws(GameServiceError) -> GameRoom {
-        guard let document = roomsByID[roomID] else {
-            throw .roomNotFound
+        nonisolated(unsafe) var featureError: GameServiceError?
+        let document = try await mapStoreError {
+            try await store.mutateDocument(id: roomID) { document in
+                switch operation(document.room) {
+                case .failure(let error):
+                    featureError = error
+                    return .failure(.backendUnavailable("PartyGame mutation rejected."))
+                case .success(.updated(let room)):
+                    return .success(FirebaseGameRoomDocument(room: room))
+                }
+            }
+        } onError: { error in
+            featureError ?? mapFirestoreError(error)
         }
-        switch operation(document.room) {
-        case .failure(let error):
-            throw error
-        case .success(.updated(let room)):
-            let nextDocument = FirebaseGameRoomDocument(room: room)
-            roomsByID[room.id] = nextDocument
-            roomIDsByJoinCode[room.joinCode] = room.id
-            return room
+        return document.room
+    }
+}
+
+public actor GenericFirebaseGameDocumentStore: FirebaseGameDocumentStore {
+    private let store: AnyFirestoreDocumentStore<FirebaseGameRoomDocument>
+
+    public init<Store: FirestoreDocumentStore>(store: Store) where Store.Document == FirebaseGameRoomDocument {
+        self.store = AnyFirestoreDocumentStore(store)
+    }
+
+    public func roomDocument(roomID: RoomID) async throws(GameServiceError) -> FirebaseGameRoomDocument? {
+        try await mapStoreError {
+            try await store.document(id: roomID)
         }
+    }
+
+    public func roomDocument(joinCode: JoinCode) async throws(GameServiceError) -> FirebaseGameRoomDocument? {
+        try await mapStoreError {
+            try await store.firstDocument(where: "joinCode", equals: joinCode.rawValue)
+        }
+    }
+
+    public func createRoomDocument(_ document: FirebaseGameRoomDocument) async throws(GameServiceError) {
+        try await mapStoreError {
+            if try await store.firstDocument(where: "joinCode", equals: document.joinCode.rawValue) != nil {
+                throw FirestoreDataServiceError.documentAlreadyExists
+            }
+            try await store.createDocument(document)
+        }
+    }
+
+    public func saveRoomDocument(_ document: FirebaseGameRoomDocument) async throws(GameServiceError) {
+        try await mapStoreError {
+            try await store.saveDocument(document)
+        }
+    }
+
+    public func mutateRoomDocument(
+        roomID: RoomID,
+        operation: @escaping @Sendable (GameRoom) -> Result<FirebaseGameMutationResult, GameServiceError>
+    ) async throws(GameServiceError) -> GameRoom {
+        nonisolated(unsafe) var featureError: GameServiceError?
+        let document = try await mapStoreError {
+            try await store.mutateDocument(id: roomID) { document in
+                switch operation(document.room) {
+                case .failure(let error):
+                    featureError = error
+                    return .failure(.backendUnavailable("PartyGame mutation rejected."))
+                case .success(.updated(let room)):
+                    return .success(FirebaseGameRoomDocument(room: room))
+                }
+            }
+        } onError: { error in
+            featureError ?? mapFirestoreError(error)
+        }
+        return document.room
+    }
+}
+
+private func mapStoreError<T>(
+    _ operation: @Sendable () async throws -> T,
+    onError: @Sendable (FirestoreDataServiceError) -> GameServiceError = { mapFirestoreError($0) }
+) async throws(GameServiceError) -> T {
+    do {
+        return try await operation()
+    } catch let error as FirestoreDataServiceError {
+        throw onError(error)
+    } catch {
+        throw .backendUnavailable(error.localizedDescription)
+    }
+}
+
+private func mapFirestoreError(_ error: FirestoreDataServiceError) -> GameServiceError {
+    switch error {
+    case .documentNotFound:
+        return .roomNotFound
+    case .documentAlreadyExists:
+        return .joinCodeUnavailable
+    case .queryConflict:
+        return .backendUnavailable("Firestore query returned conflicting game room documents.")
+    case .backendUnavailable(let message):
+        return .backendUnavailable(message)
     }
 }
 
