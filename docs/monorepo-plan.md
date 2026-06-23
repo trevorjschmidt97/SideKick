@@ -9,8 +9,9 @@ Build many apps from shared Swift layers. The repo should make boilerplate reusa
 4. **Managers**: Shared state and focused app capabilities.
 5. **Services**: Platform/vendor/shared infrastructure implementations.
 6. **Apps**: Composition roots, resources, permissions, lifecycle, and extensions.
-7. **Navigation**: App-owned route state, root trees, deep links, Handoff, and restoration.
-8. **Design Systems**: Repo-wide UI foundation plus app-owned brand layers.
+7. **Platforms**: Platform-specific shells and capabilities.
+8. **Navigation**: App-owned route state, root trees, deep links, Handoff, and restoration.
+9. **Design Systems**: Repo-wide UI foundation plus app-owned brand layers.
 
 ## Modules
 Modules are reusable UI pieces. They own presentation and view state, not app composition, vendor integrations, or cross-feature orchestration.
@@ -70,9 +71,9 @@ Managers should:
 3. Expose debug modules for DevTools and developer settings.
 4. Have unit tests against mocked services.
 
-Managers are not one-to-one with services. A Manager can depend on many service protocols, such as feature services, `DataService`, `ABPropsService`, `LoggingService`, and `PreferencesService`.
+Managers are not one-to-one with services. A Manager can depend on many service protocols, such as feature services, `DataService`, `ABPropsService`, `LoggingService`, and `PreferencesService`. New functionality can add new Managers and Services as needed.
 
-Required Managers:
+Baseline Manager examples:
 1. ABProps
 2. Logging
 3. Haptics
@@ -115,6 +116,11 @@ Apps should:
 A DevTools app should expose every Manager debug module and serve as the template for future apps.
 
 An optional Architecture module can hold dependency containers, lifecycle adapters, environment injection, and root app bootstrapping.
+
+## Platforms
+Apps should be platform-aware composition targets. Shared Modules, Intents, Core, Managers, Services, and Design Systems should stay reusable across iPhone, iPad, watchOS, tvOS, widgets, and extensions when practical.
+
+Platform targets own platform-specific shells, resources, entitlements, permissions, navigation chrome, and presentation choices. Shared contracts should expose capability checks when behavior differs by platform.
 
 ## Navigation
 Navigation is app-owned. Modules describe navigation intent; Apps perform navigation.
@@ -190,8 +196,9 @@ Shared modules depend on the repo-wide Design System. App-specific modules may d
 11. Services may support many Managers.
 12. Services should not depend on concrete Managers.
 13. Apps may depend on everything and assemble the graph.
-14. Apps own root tree selection, route encoding/decoding, Handoff, deep links, and restoration.
-15. Modules should not mutate root trees or push raw app routes.
-16. Root trees should expose only routes valid for the current eligibility state.
-17. App-specific Design Systems are app-owned and may depend on the repo-wide Design System.
-18. Shared modules should not depend on app-specific Design Systems unless intentionally app-specific.
+14. Platform targets own platform-specific shells, resources, entitlements, permissions, and presentation choices.
+15. Apps own root tree selection, route encoding/decoding, Handoff, deep links, and restoration.
+16. Modules should not mutate root trees or push raw app routes.
+17. Root trees should expose only routes valid for the current eligibility state.
+18. App-specific Design Systems are app-owned and may depend on the repo-wide Design System.
+19. Shared modules should not depend on app-specific Design Systems unless intentionally app-specific.
