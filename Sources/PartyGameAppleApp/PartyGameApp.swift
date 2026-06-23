@@ -13,17 +13,19 @@ import SideKickAppCore
 public struct PartyGameBootstrapView: View {
     private let platform: SideKickPlatform
     private let initialRole: GameRole?
+    private let launchJoin: PartyGameLaunchJoin?
     @State private var service: (any GameService)?
 
-    public init(platform: SideKickPlatform, initialRole: GameRole? = nil) {
+    public init(platform: SideKickPlatform, initialRole: GameRole? = nil, launchJoin: PartyGameLaunchJoin? = nil) {
         self.platform = platform
         self.initialRole = initialRole
+        self.launchJoin = launchJoin
     }
 
     public var body: some View {
         Group {
             if let service {
-                PartyGameRootView(platform: platform, service: service, initialRole: initialRole)
+                PartyGameRootView(platform: platform, service: service, initialRole: initialRole, launchJoin: launchJoin)
             } else {
                 ProgressView()
                     .task {
@@ -55,19 +57,22 @@ public struct PartyGameRootView: View {
     @State private var gameManager: GameManager
     @State private var navigationStore: AppNavigationStore
     private let initialRole: GameRole?
+    private let launchJoin: PartyGameLaunchJoin?
 
     public init(
         platform: SideKickPlatform,
         service: any GameService,
-        initialRole: GameRole? = nil
+        initialRole: GameRole? = nil,
+        launchJoin: PartyGameLaunchJoin? = nil
     ) {
         _gameManager = State(initialValue: GameManager(service: service))
         _navigationStore = State(initialValue: AppNavigationStore(platform: platform))
         self.initialRole = initialRole
+        self.launchJoin = launchJoin
     }
 
     public var body: some View {
-        GameRootView(gameManager: gameManager, navigationStore: navigationStore)
+        GameRootView(gameManager: gameManager, navigationStore: navigationStore, launchJoin: launchJoin)
             .task {
                 if let initialRole {
                     navigationStore.selectRole(initialRole)
@@ -79,6 +84,7 @@ public struct PartyGameRootView: View {
 struct GameRootView: View {
     @State var gameManager: GameManager
     @State var navigationStore: AppNavigationStore
+    var launchJoin: PartyGameLaunchJoin?
 
     var body: some View {
         NavigationStack {
@@ -112,6 +118,12 @@ struct GameRootView: View {
                     )
                     JoinModuleView(viewModel: viewModel)
                         .task {
+                            if let launchJoin, gameManager.snapshot.room == nil {
+                                _ = try? await gameManager.joinRoom(
+                                    joinCode: launchJoin.joinCode,
+                                    displayName: launchJoin.displayName
+                                )
+                            }
                             while !Task.isCancelled {
                                 try? await Task.sleep(for: .seconds(1))
                                 if gameManager.snapshot.room != nil {
@@ -134,6 +146,16 @@ struct GameRootView: View {
                 DevSettingsView(gameManager: gameManager)
             }
         }
+    }
+}
+
+public struct PartyGameLaunchJoin: Sendable {
+    public var joinCode: JoinCode
+    public var displayName: String
+
+    public init(joinCode: JoinCode, displayName: String) {
+        self.joinCode = joinCode
+        self.displayName = displayName
     }
 }
 
