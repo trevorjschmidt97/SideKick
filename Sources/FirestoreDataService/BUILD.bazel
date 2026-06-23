@@ -1,0 +1,26 @@
+load("@rules_swift//swift:swift.bzl", "swift_library")
+
+swift_library(
+    name = "FirestoreDataService",
+    srcs = [
+        "FirestoreDataService.swift",
+        "FirestoreSDKDocumentStore.swift",
+    ],
+    module_name = "FirestoreDataService",
+    visibility = [
+        "//:sidekick_packages",
+        "//Tests/SideKickTests:__pkg__",
+    ],
+)
+
+swift_library(
+    name = "FirestoreDataServiceSDK",
+    srcs = [
+        "FirestoreDataService.swift",
+        "FirestoreSDKDocumentStore.swift",
+    ],
+    module_name = "FirestoreDataService",
+    tags = ["manual"],
+    deps = ["@swiftpkg_firebase_ios_sdk//:FirebaseFirestore"],
+    visibility = ["//visibility:public"],
+)

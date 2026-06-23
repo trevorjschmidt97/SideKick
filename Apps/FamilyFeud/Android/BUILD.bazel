@@ -1,0 +1,5 @@
+filegroup(
+    name = "android_placeholder",
+    srcs = ["README.md"],
+    visibility = ["//visibility:public"],
+)

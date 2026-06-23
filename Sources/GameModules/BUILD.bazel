@@ -1,0 +1,64 @@
+load("@rules_swift//swift:swift.bzl", "swift_library")
+
+swift_library(
+    name = "GameModuleShared",
+    srcs = [
+        "GameModuleEvents.swift",
+        "GameModuleStrings.swift",
+        "SharedGameModuleViews.swift",
+    ],
+    module_name = "GameModuleShared",
+    deps = ["//Sources/GameCore:GameCore"],
+    visibility = [
+        "//Sources/GameModules:__pkg__",
+        "//Tests/SideKickTests:__pkg__",
+    ],
+)
+
+swift_library(
+    name = "GameEntryModule",
+    srcs = [
+        "GameEntryModule.swift",
+    ],
+    module_name = "GameEntryModule",
+    deps = [
+        ":GameModuleShared",
+        "//Sources/GameCore:GameCore",
+    ],
+    visibility = [
+        "//Sources/JeopardyAppleApp:__pkg__",
+        "//Tests/SideKickTests:__pkg__",
+    ],
+)
+
+swift_library(
+    name = "BoardGameModule",
+    srcs = [
+        "BoardModule.swift",
+    ],
+    module_name = "BoardGameModule",
+    deps = [
+        ":GameModuleShared",
+        "//Sources/GameCore:GameCore",
+    ],
+    visibility = [
+        "//Sources/JeopardyAppleApp:__pkg__",
+        "//Tests/SideKickTests:__pkg__",
+    ],
+)
+
+swift_library(
+    name = "JoinGameModule",
+    srcs = [
+        "JoinModule.swift",
+    ],
+    module_name = "JoinGameModule",
+    deps = [
+        ":GameModuleShared",
+        "//Sources/GameCore:GameCore",
+    ],
+    visibility = [
+        "//Sources/JeopardyAppleApp:__pkg__",
+        "//Tests/SideKickTests:__pkg__",
+    ],
+)

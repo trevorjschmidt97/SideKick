@@ -1,0 +1,12 @@
+load("@rules_swift//swift:swift.bzl", "swift_library")
+
+swift_library(
+    name = "GameCore",
+    srcs = [
+        "GameModels.swift",
+        "GameRules.swift",
+        "GameService.swift",
+    ],
+    module_name = "GameCore",
+    visibility = ["//:sidekick_packages"],
+)

@@ -1,0 +1,17 @@
+public enum GameModuleStrings {
+    public static let title = "SideKick Jeopardy"
+    public static let gameBoard = "Game Board"
+    public static let joinGame = "Join a Game"
+    public static let createGameBoard = "Create Game Board"
+    public static let waitingPlayers = "Waiting Players"
+    public static let startGame = "Start Game"
+    public static let joinCode = "Join Code"
+    public static let displayName = "Display Name"
+    public static let buzz = "Buzz"
+    public static let correct = "Correct"
+    public static let incorrect = "Incorrect"
+    public static let waitingForHost = "Waiting for host"
+    public static let chooseClue = "Choose a clue on the board"
+    public static let buzzingLocked = "Buzzing locked"
+    public static let gameOver = "Game Over"
+}

@@ -1,0 +1,110 @@
+load("@rules_apple//apple:ios.bzl", "ios_application")
+load("@rules_apple//apple:macos.bzl", "macos_application")
+load("@rules_apple//apple:tvos.bzl", "tvos_application")
+load("@rules_apple//apple:watchos.bzl", "watchos_application")
+load("@rules_swift//swift:swift.bzl", "swift_library")
+
+swift_library(
+    name = "Jeopardy_iOSMain",
+    srcs = ["Sources/JeopardyIOSMain.swift"],
+    deps = [
+        "//Sources/GameServices:GameServices",
+        "//Sources/JeopardyAppCore:JeopardyAppCore",
+        "//Sources/JeopardyAppleApp:JeopardyAppleApp",
+        "//Sources/SideKickAppCore:SideKickAppCore",
+    ],
+)
+
+swift_library(
+    name = "Jeopardy_iOSMain_FirebaseLocal",
+    srcs = ["Sources/JeopardyIOSMain.swift"],
+    tags = ["manual"],
+    deps = [
+        "//Sources/GameServices:GameServices",
+        "//Sources/JeopardyAppCore:JeopardyAppCore",
+        "//Sources/JeopardyAppleApp:JeopardyAppleAppFirebaseLocal",
+        "//Sources/SideKickAppCore:SideKickAppCore",
+    ],
+)
+
+swift_library(
+    name = "Jeopardy_macOSMain",
+    srcs = ["Sources/JeopardyMacMain.swift"],
+    deps = [
+        "//Sources/GameServices:GameServices",
+        "//Sources/JeopardyAppCore:JeopardyAppCore",
+        "//Sources/JeopardyAppleApp:JeopardyAppleApp",
+        "//Sources/SideKickAppCore:SideKickAppCore",
+    ],
+)
+
+swift_library(
+    name = "Jeopardy_tvOSMain",
+    srcs = ["Sources/JeopardyTVMain.swift"],
+    deps = [
+        "//Sources/GameServices:GameServices",
+        "//Sources/JeopardyAppCore:JeopardyAppCore",
+        "//Sources/JeopardyAppleApp:JeopardyAppleApp",
+        "//Sources/SideKickAppCore:SideKickAppCore",
+    ],
+)
+
+swift_library(
+    name = "Jeopardy_watchOSMain",
+    srcs = ["Sources/JeopardyWatchMain.swift"],
+    deps = [
+        "//Sources/GameServices:GameServices",
+        "//Sources/JeopardyAppCore:JeopardyAppCore",
+        "//Sources/JeopardyAppleApp:JeopardyAppleApp",
+        "//Sources/SideKickAppCore:SideKickAppCore",
+    ],
+)
+
+ios_application(
+    name = "Jeopardy_iOS",
+    bundle_id = "com.sidekick.jeopardy",
+    families = [
+        "iphone",
+        "ipad",
+    ],
+    infoplists = ["Resources/iOS/Info.plist"],
+    minimum_os_version = "18.0",
+    deps = [":Jeopardy_iOSMain"],
+)
+
+ios_application(
+    name = "Jeopardy_iOS_FirebaseLocal",
+    bundle_id = "com.sidekick.jeopardy.local",
+    families = [
+        "iphone",
+        "ipad",
+    ],
+    infoplists = ["Resources/iOS/Info.plist"],
+    minimum_os_version = "18.0",
+    tags = ["manual"],
+    deps = [":Jeopardy_iOSMain_FirebaseLocal"],
+)
+
+macos_application(
+    name = "Jeopardy_macOS",
+    bundle_id = "com.sidekick.jeopardy.mac",
+    infoplists = ["Resources/macOS/Info.plist"],
+    minimum_os_version = "15.0",
+    deps = [":Jeopardy_macOSMain"],
+)
+
+tvos_application(
+    name = "Jeopardy_tvOS",
+    bundle_id = "com.sidekick.jeopardy.tv",
+    infoplists = ["Resources/tvOS/Info.plist"],
+    minimum_os_version = "18.0",
+    deps = [":Jeopardy_tvOSMain"],
+)
+
+watchos_application(
+    name = "Jeopardy_watchOS",
+    bundle_id = "com.sidekick.jeopardy.watch",
+    infoplists = ["Resources/watchOS/Info.plist"],
+    minimum_os_version = "11.0",
+    deps = [":Jeopardy_watchOSMain"],
+)

@@ -1,0 +1,5 @@
+.build
+bazel-SideKick
+bazel-bin
+bazel-out
+bazel-testlogs

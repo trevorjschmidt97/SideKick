@@ -1,0 +1,102 @@
+load("@rules_apple//apple:ios.bzl", "ios_application")
+load("@rules_apple//apple:macos.bzl", "macos_application")
+load("@rules_apple//apple:tvos.bzl", "tvos_application")
+load("@rules_apple//apple:watchos.bzl", "watchos_application")
+load("@rules_swift//swift:swift.bzl", "swift_library")
+
+swift_library(
+    name = "FamilyFeud_iOSMain",
+    srcs = ["Sources/FamilyFeudIOSMain.swift"],
+    deps = [
+        "//Sources/FamilyFeudAppleApp:FamilyFeudAppleApp",
+        "//Sources/SideKickAppCore:SideKickAppCore",
+    ],
+)
+
+swift_library(
+    name = "FamilyFeud_iOSMain_FirebaseLocal",
+    srcs = ["Sources/FamilyFeudIOSMain.swift"],
+    tags = ["manual"],
+    deps = [
+        "//Sources/FamilyFeudAppleApp:FamilyFeudAppleAppFirebaseLocal",
+        "//Sources/SideKickAppCore:SideKickAppCore",
+    ],
+)
+
+swift_library(
+    name = "FamilyFeud_macOSMain",
+    srcs = ["Sources/FamilyFeudMacMain.swift"],
+    deps = [
+        "//Sources/FamilyFeudAppleApp:FamilyFeudAppleApp",
+        "//Sources/SideKickAppCore:SideKickAppCore",
+    ],
+)
+
+swift_library(
+    name = "FamilyFeud_tvOSMain",
+    srcs = ["Sources/FamilyFeudTVMain.swift"],
+    deps = [
+        "//Sources/FamilyFeudAppCore:FamilyFeudAppCore",
+        "//Sources/FamilyFeudAppleApp:FamilyFeudAppleApp",
+        "//Sources/SideKickAppCore:SideKickAppCore",
+    ],
+)
+
+swift_library(
+    name = "FamilyFeud_watchOSMain",
+    srcs = ["Sources/FamilyFeudWatchMain.swift"],
+    deps = [
+        "//Sources/FamilyFeudAppCore:FamilyFeudAppCore",
+        "//Sources/FamilyFeudAppleApp:FamilyFeudAppleApp",
+        "//Sources/SideKickAppCore:SideKickAppCore",
+    ],
+)
+
+ios_application(
+    name = "FamilyFeud_iOS",
+    bundle_id = "com.sidekick.familyfeud",
+    families = [
+        "iphone",
+        "ipad",
+    ],
+    infoplists = ["Resources/iOS/Info.plist"],
+    minimum_os_version = "18.0",
+    deps = [":FamilyFeud_iOSMain"],
+)
+
+ios_application(
+    name = "FamilyFeud_iOS_FirebaseLocal",
+    bundle_id = "com.sidekick.familyfeud.local",
+    families = [
+        "iphone",
+        "ipad",
+    ],
+    infoplists = ["Resources/iOS/Info.plist"],
+    minimum_os_version = "18.0",
+    tags = ["manual"],
+    deps = [":FamilyFeud_iOSMain_FirebaseLocal"],
+)
+
+macos_application(
+    name = "FamilyFeud_macOS",
+    bundle_id = "com.sidekick.familyfeud.mac",
+    infoplists = ["Resources/macOS/Info.plist"],
+    minimum_os_version = "15.0",
+    deps = [":FamilyFeud_macOSMain"],
+)
+
+tvos_application(
+    name = "FamilyFeud_tvOS",
+    bundle_id = "com.sidekick.familyfeud.tv",
+    infoplists = ["Resources/tvOS/Info.plist"],
+    minimum_os_version = "18.0",
+    deps = [":FamilyFeud_tvOSMain"],
+)
+
+watchos_application(
+    name = "FamilyFeud_watchOS",
+    bundle_id = "com.sidekick.familyfeud.watch",
+    infoplists = ["Resources/watchOS/Info.plist"],
+    minimum_os_version = "11.0",
+    deps = [":FamilyFeud_watchOSMain"],
+)

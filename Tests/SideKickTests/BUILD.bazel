@@ -1,0 +1,31 @@
+load("@rules_swift//swift:swift.bzl", "swift_test")
+
+swift_test(
+    name = "SideKickTests",
+    srcs = glob(["*.swift"]),
+    module_name = "SideKickTests",
+    deps = [
+        "//Sources/FirebaseGameService:FirebaseGameService",
+        "//Sources/FirebaseCoreService:FirebaseCoreService",
+        "//Sources/FirebaseFamilyFeudService:FirebaseFamilyFeudService",
+        "//Sources/FirestoreDataService:FirestoreDataService",
+        "//Sources/FamilyFeudAppCore:FamilyFeudAppCore",
+        "//Sources/FamilyFeudAppleApp:FamilyFeudAppleApp",
+        "//Sources/FamilyFeudCore:FamilyFeudCore",
+        "//Sources/FamilyFeudIntents:FamilyFeudIntents",
+        "//Sources/FamilyFeudModules:FamilyFeudModules",
+        "//Sources/FamilyFeudManagers:FamilyFeudManagers",
+        "//Sources/FamilyFeudServices:FamilyFeudServices",
+        "//Sources/GameCore:GameCore",
+        "//Sources/GameIntents:GameIntents",
+        "//Sources/GameModules:BoardGameModule",
+        "//Sources/GameModules:GameEntryModule",
+        "//Sources/GameModules:GameModuleShared",
+        "//Sources/GameModules:JoinGameModule",
+        "//Sources/GameManagers:GameManagers",
+        "//Sources/GameServices:GameServices",
+        "//Sources/JeopardyAppCore:JeopardyAppCore",
+        "//Sources/JeopardyAppleApp:JeopardyAppleApp",
+        "//Sources/SideKickAppCore:SideKickAppCore",
+    ],
+)
