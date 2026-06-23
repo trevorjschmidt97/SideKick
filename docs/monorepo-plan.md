@@ -11,7 +11,8 @@ Build many apps from shared Swift layers. The repo should make boilerplate reusa
 6. **Apps**: Composition roots, resources, permissions, lifecycle, and extensions.
 7. **Platforms**: Platform-specific shells and capabilities.
 8. **Navigation**: App-owned route state, root trees, deep links, Handoff, and restoration.
-9. **Design Systems**: Repo-wide UI foundation plus app-owned brand layers.
+9. **Performance and Concurrency**: Main-actor UI state with off-main work.
+10. **Design Systems**: Repo-wide UI foundation plus app-owned brand layers.
 
 ## Modules
 Modules are reusable UI pieces. They own presentation and view state, not app composition, vendor integrations, or cross-feature orchestration.
@@ -156,6 +157,25 @@ Routes should be Codable, Hashable, versionable, and backed by module Configs. T
 
 If a signed-out user opens a signed-in deep link, the app should store a pending route, show auth, then apply the route after sign-in succeeds.
 
+## Performance and Concurrency
+Modules should be `@MainActor`. Observable Managers should usually be `@MainActor` because they publish UI-facing state.
+
+Managers should be thin main-actor facades. They update observable state, start async work, receive results, and publish small immutable snapshots. They should not perform disk IO, network waiting, decoding, migrations, SDK setup, image work, or expensive transforms on the main actor.
+
+Services, data stores, caches, sync engines, and SDK adapters should be background-capable async types or actors. They own IO, vendor calls, persistence, mutable non-UI state, and heavy computation.
+
+`async` does not guarantee work leaves the main actor. Expensive work must be intentionally kept outside `@MainActor` isolation.
+
+Performance rules:
+1. Build dependencies lazily.
+2. Keep manager methods thin.
+3. Keep services off the main actor unless a platform API requires it.
+4. Use actors for mutable non-UI state.
+5. Publish small immutable snapshots to UI.
+6. Batch or debounce high-frequency state updates.
+7. Avoid SDK initialization before first frame unless required.
+8. Never block the main actor with disk, network, decoding, migrations, or expensive transforms.
+
 ## Design Systems
 The repo-wide Design System defines the shared UI foundation:
 1. Tokens
@@ -198,7 +218,8 @@ Shared modules depend on the repo-wide Design System. App-specific modules may d
 13. Apps may depend on everything and assemble the graph.
 14. Platform targets own platform-specific shells, resources, entitlements, permissions, and presentation choices.
 15. Apps own root tree selection, route encoding/decoding, Handoff, deep links, and restoration.
-16. Modules should not mutate root trees or push raw app routes.
-17. Root trees should expose only routes valid for the current eligibility state.
-18. App-specific Design Systems are app-owned and may depend on the repo-wide Design System.
-19. Shared modules should not depend on app-specific Design Systems unless intentionally app-specific.
+16. Modules and observable Managers should be main-actor isolated; Services and heavy work should stay off-main.
+17. Modules should not mutate root trees or push raw app routes.
+18. Root trees should expose only routes valid for the current eligibility state.
+19. App-specific Design Systems are app-owned and may depend on the repo-wide Design System.
+20. Shared modules should not depend on app-specific Design Systems unless intentionally app-specific.
