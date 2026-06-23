@@ -11,17 +11,19 @@ import SideKickAppCore
 public struct FamilyFeudBootstrapView: View {
     private let platform: SideKickPlatform
     private let initialRole: FamilyFeudRole?
+    private let launchJoin: FamilyFeudLaunchJoin?
     @State private var service: (any FamilyFeudService)?
 
-    public init(platform: SideKickPlatform, initialRole: FamilyFeudRole? = nil) {
+    public init(platform: SideKickPlatform, initialRole: FamilyFeudRole? = nil, launchJoin: FamilyFeudLaunchJoin? = nil) {
         self.platform = platform
         self.initialRole = initialRole
+        self.launchJoin = launchJoin
     }
 
     public var body: some View {
         Group {
             if let service {
-                FamilyFeudRootView(platform: platform, service: service, initialRole: initialRole)
+                FamilyFeudRootView(platform: platform, service: service, initialRole: initialRole, launchJoin: launchJoin)
             } else {
                 ProgressView()
                     .task {
@@ -44,15 +46,22 @@ public struct FamilyFeudRootView: View {
     @State private var manager: FamilyFeudManager
     @State private var navigationStore: FamilyFeudNavigationStore
     private let initialRole: FamilyFeudRole?
+    private let launchJoin: FamilyFeudLaunchJoin?
 
-    public init(platform: SideKickPlatform, service: any FamilyFeudService, initialRole: FamilyFeudRole? = nil) {
+    public init(
+        platform: SideKickPlatform,
+        service: any FamilyFeudService,
+        initialRole: FamilyFeudRole? = nil,
+        launchJoin: FamilyFeudLaunchJoin? = nil
+    ) {
         _manager = State(initialValue: FamilyFeudManager(service: service))
         _navigationStore = State(initialValue: FamilyFeudNavigationStore(platform: platform))
         self.initialRole = initialRole
+        self.launchJoin = launchJoin
     }
 
     public var body: some View {
-        FamilyFeudRootContent(manager: manager, navigationStore: navigationStore)
+        FamilyFeudRootContent(manager: manager, navigationStore: navigationStore, launchJoin: launchJoin)
             .task {
                 if let initialRole {
                     navigationStore.selectRole(initialRole)
@@ -64,6 +73,7 @@ public struct FamilyFeudRootView: View {
 struct FamilyFeudRootContent: View {
     @State var manager: FamilyFeudManager
     @State var navigationStore: FamilyFeudNavigationStore
+    var launchJoin: FamilyFeudLaunchJoin?
 
     var body: some View {
         NavigationStack {
@@ -97,6 +107,12 @@ struct FamilyFeudRootContent: View {
                     )
                     FamilyFeudJoinModuleView(viewModel: viewModel)
                         .task {
+                            if let launchJoin, manager.snapshot.room == nil {
+                                _ = try? await manager.joinRoom(
+                                    joinCode: launchJoin.joinCode,
+                                    displayName: launchJoin.displayName
+                                )
+                            }
                             while !Task.isCancelled {
                                 try? await Task.sleep(for: .seconds(1))
                                 if manager.snapshot.room != nil {
@@ -114,6 +130,16 @@ struct FamilyFeudRootContent: View {
                 FamilyFeudDevSettingsView(manager: manager)
             }
         }
+    }
+}
+
+public struct FamilyFeudLaunchJoin: Sendable {
+    public var joinCode: FeudJoinCode
+    public var displayName: String
+
+    public init(joinCode: FeudJoinCode, displayName: String) {
+        self.joinCode = joinCode
+        self.displayName = displayName
     }
 }
 

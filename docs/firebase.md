@@ -37,7 +37,8 @@ credentials are absent:
 - PartyGame: `FakeLocalGameService`
 - Family Feud: `FakeLocalFamilyFeudService`
 
-For local Firebase work, run Firestore and Auth emulators together:
+For production-like Firebase rule work, run Firestore and Auth emulators
+together:
 
 ```sh
 firebase emulators:start --only firestore,auth
@@ -46,9 +47,9 @@ firebase emulators:start --only firestore,auth
 PartyGame app composition uses production Firebase when
 `GoogleService-Info.plist` is present. Without credentials, SDK-backed local
 Firebase builds use `FirebaseGameServiceFactory.makeLocalEmulatorService()` with
-demo Firebase options. That path configures Firebase, signs in anonymously
-through the Auth emulator, configures Firestore to use the local emulator, and
-returns `any GameService`.
+demo Firebase options. That path configures Firebase, uses a stable local
+principal for the app install, configures Firestore to use the local emulator
+with SSL disabled, and returns `any GameService`.
 
 Family Feud uses `FirebaseFamilyFeudServiceFactory.makeLocalEmulatorService()`
 for SDK-backed local Firebase builds. It stores documents in
@@ -61,8 +62,14 @@ Firebase emulators, use the manual `*_FirebaseLocal` app targets.
 Start the local backend:
 
 ```sh
-firebase emulators:start --only firestore,auth --project demo-sidekick
+firebase --config firebase.local.json emulators:start --only firestore,auth --project demo-sidekick
 ```
+
+`firebase.local.json` uses `firestore.local.rules`, which intentionally allows
+local simulator reads and writes without Firebase Auth. This avoids simulator
+keychain/signing requirements while still running all shared state through the
+local Firestore emulator. Use `firebase.json` and `firestore.rules` when
+validating production-style Auth rules.
 
 Then run as many simulators as you want against the same local backend:
 

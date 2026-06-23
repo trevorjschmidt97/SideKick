@@ -11,8 +11,8 @@ import FirebaseFirestore
 public enum FirebaseGameServiceFactory {
     public static func makeLocalEmulatorService(
         projectID: String = "demo-sidekick",
-        firestoreEmulatorHost: String = "localhost:8080",
-        authEmulatorHost: String = "localhost:9099",
+        firestoreEmulatorHost: String = "127.0.0.1:8080",
+        authEmulatorHost: String = "127.0.0.1:9099",
         database: Any? = nil
     ) async throws(GameServiceError) -> any GameService {
         try await makeAuthenticatedService(
@@ -47,17 +47,23 @@ public enum FirebaseGameServiceFactory {
         if FirebaseApp.app() == nil {
             configureFirebaseApp(configuration: configuration, allowsDemoOptions: allowsDemoOptions)
         }
-        configureAuthEmulatorIfNeeded(configuration: configuration)
-
-        let authUser: User
-        if let currentUser = Auth.auth().currentUser {
-            authUser = currentUser
+        let principal: FirebaseGameServicePrincipal
+        if configuration.usesEmulator && allowsDemoOptions {
+            principal = FirebaseGameServicePrincipal(userID: localEmulatorUserID())
         } else {
-            do {
-                authUser = try await Auth.auth().signInAnonymously().user
-            } catch {
-                throw .backendUnavailable("Firebase anonymous sign-in failed: \(error.localizedDescription)")
+            configureAuthEmulatorIfNeeded(configuration: configuration)
+
+            let authUser: User
+            if let currentUser = Auth.auth().currentUser {
+                authUser = currentUser
+            } else {
+                do {
+                    authUser = try await Auth.auth().signInAnonymously().user
+                } catch {
+                    throw .backendUnavailable("Firebase anonymous sign-in failed: \(error.localizedDescription)")
+                }
             }
+            principal = FirebaseGameServicePrincipal(userID: authUser.uid)
         }
 
         let firestore: Firestore
@@ -70,7 +76,7 @@ public enum FirebaseGameServiceFactory {
 
         return FirebaseGameService(
             configuration: configuration,
-            principal: FirebaseGameServicePrincipal(userID: authUser.uid),
+            principal: principal,
             store: GenericFirebaseGameDocumentStore(
                 store: FirestoreSDKDocumentStore<FirebaseGameRoomDocument>(collection: firestore.collection("rooms"))
             )
@@ -89,10 +95,10 @@ public enum FirebaseGameServiceFactory {
         if allowsDemoOptions {
             let projectID = configuration.projectID ?? "demo-sidekick"
             let options = FirebaseOptions(
-                googleAppID: "1:1234567890:ios:\(projectID.replacingOccurrences(of: "-", with: ""))",
+                googleAppID: "1:1234567890:ios:1234567890abcdef123456",
                 gcmSenderID: "1234567890"
             )
-            options.apiKey = "fake-api-key"
+            options.apiKey = "AIzaSyDLocalEmulatorOnlyKey000000000000000"
             options.projectID = projectID
             options.bundleID = Bundle.main.bundleIdentifier ?? "com.sidekick.local"
             FirebaseApp.configure(options: options)
@@ -105,7 +111,7 @@ public enum FirebaseGameServiceFactory {
         guard configuration.usesEmulator else {
             return
         }
-        let (host, port) = hostAndPortParts(configuration.authEmulatorHost ?? "localhost:9099", defaultPort: 9099)
+        let (host, port) = hostAndPortParts(configuration.authEmulatorHost ?? "127.0.0.1:9099", defaultPort: 9099)
         Auth.auth().useEmulator(withHost: host, port: port)
     }
 
@@ -116,15 +122,28 @@ public enum FirebaseGameServiceFactory {
         guard configuration.usesEmulator else {
             return
         }
-        let (host, port) = hostAndPortParts(configuration.emulatorHost ?? "localhost:8080", defaultPort: 8080)
-        database.useEmulator(withHost: host, port: port)
+        let (host, port) = hostAndPortParts(configuration.emulatorHost ?? "127.0.0.1:8080", defaultPort: 8080)
+        let settings = database.settings
+        settings.host = "\(host):\(port)"
+        settings.isSSLEnabled = false
+        database.settings = settings
     }
 
     private static func hostAndPortParts(_ hostAndPort: String, defaultPort: Int) -> (String, Int) {
         let parts = hostAndPort.split(separator: ":", maxSplits: 1).map(String.init)
-        let host = parts.first ?? "localhost"
+        let host = parts.first ?? "127.0.0.1"
         let port = parts.dropFirst().first.flatMap(Int.init) ?? defaultPort
         return (host, port)
+    }
+
+    private static func localEmulatorUserID() -> String {
+        let key = "SideKick.FirebaseGameService.localEmulatorUserID"
+        if let existing = UserDefaults.standard.string(forKey: key) {
+            return existing
+        }
+        let created = "local-\(UUID().uuidString)"
+        UserDefaults.standard.set(created, forKey: key)
+        return created
     }
     #endif
 }
