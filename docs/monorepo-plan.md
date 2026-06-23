@@ -10,9 +10,10 @@ Build many apps from shared Swift layers. The repo should make boilerplate reusa
 5. **Services**: Platform/vendor/shared infrastructure implementations.
 6. **Apps**: Composition roots, resources, permissions, lifecycle, and extensions.
 7. **Platforms**: Platform-specific shells and capabilities.
-8. **Navigation**: App-owned route state, root trees, deep links, Handoff, and restoration.
-9. **Performance and Concurrency**: Main-actor UI state with off-main work.
-10. **Design Systems**: Repo-wide UI foundation plus app-owned brand layers.
+8. **Build System**: Bazel-owned build graph.
+9. **Navigation**: App-owned route state, root trees, deep links, Handoff, and restoration.
+10. **Performance and Concurrency**: Main-actor UI state with off-main work.
+11. **Design Systems**: Repo-wide UI foundation plus app-owned brand layers.
 
 ## Modules
 Modules are reusable UI pieces. They own presentation and view state, not app composition, vendor integrations, or cross-feature orchestration.
@@ -123,6 +124,22 @@ Apps should be platform-aware composition targets. Shared Modules, Intents, Core
 
 Platform targets own platform-specific shells, resources, entitlements, permissions, navigation chrome, and presentation choices. Shared contracts should expose capability checks when behavior differs by platform.
 
+## Build System
+Bazel is the repo's build source of truth.
+
+Bazel should declare:
+1. Swift libraries and tests for Modules, Intents, `<Feature>Core`, Managers, Services, and Design Systems.
+2. Apple apps, extensions, resources, entitlements, and platform bundles through Apple/Swift rules.
+3. Android targets when Android support is added.
+4. Code generation, build plugins, and generated sources as explicit actions.
+5. Test targets and CI entry points.
+
+`BUILD.bazel` files should live near the source they describe. Targets should be small, explicit, and named after architecture units. Dependency violations should fail at build time.
+
+Generated Xcode projects may exist for IDE ergonomics, but they are not the source of truth. SwiftPM manifests may exist for portable shared Swift packages or external distribution, but Bazel owns the internal dependency graph.
+
+Bazel should start with local builds and local caching. Remote cache and remote execution can be added when build times justify the infrastructure.
+
 ## Navigation
 Navigation is app-owned. Modules describe navigation intent; Apps perform navigation.
 
@@ -203,23 +220,25 @@ Apps/
 Shared modules depend on the repo-wide Design System. App-specific modules may depend on the app-specific Design System.
 
 ## Dependency Rules
-1. Modules may depend on Architecture, repo-wide DesignSystem, and needed `<Feature>Core` targets.
-2. Modules define Interactor and Router protocols; implementations live outside reusable modules.
-3. Navigation Configs must be Codable, URL-representable, versionable, and safe to persist.
-4. Intents may depend on Architecture and Manager protocols/models from `<Feature>Core`.
-5. Intents may coordinate multiple Managers.
-6. Intents should not import AppIntents.
-7. AppIntents should be thin adapters around internal Intents.
-8. Internal throwing APIs should use Swift 6 typed throws. Generic `Error` belongs only at unavoidable adapter boundaries.
-9. Managers may depend on Architecture, `<Feature>Core`, and multiple service protocols.
-10. Services may depend on `<Feature>Core`, shared service protocol targets, platform frameworks, and vendor SDKs.
-11. Services may support many Managers.
-12. Services should not depend on concrete Managers.
-13. Apps may depend on everything and assemble the graph.
-14. Platform targets own platform-specific shells, resources, entitlements, permissions, and presentation choices.
-15. Apps own root tree selection, route encoding/decoding, Handoff, deep links, and restoration.
-16. Modules and observable Managers should be main-actor isolated; Services and heavy work should stay off-main.
-17. Modules should not mutate root trees or push raw app routes.
-18. Root trees should expose only routes valid for the current eligibility state.
-19. App-specific Design Systems are app-owned and may depend on the repo-wide Design System.
-20. Shared modules should not depend on app-specific Design Systems unless intentionally app-specific.
+1. Bazel owns the internal build graph and CI targets.
+2. Bazel targets should stay small, explicit, and aligned with architecture units.
+3. Modules may depend on Architecture, repo-wide DesignSystem, and needed `<Feature>Core` targets.
+4. Modules define Interactor and Router protocols; implementations live outside reusable modules.
+5. Navigation Configs must be Codable, URL-representable, versionable, and safe to persist.
+6. Intents may depend on Architecture and Manager protocols/models from `<Feature>Core`.
+7. Intents may coordinate multiple Managers.
+8. Intents should not import AppIntents.
+9. AppIntents should be thin adapters around internal Intents.
+10. Internal throwing APIs should use Swift 6 typed throws. Generic `Error` belongs only at unavoidable adapter boundaries.
+11. Managers may depend on Architecture, `<Feature>Core`, and multiple service protocols.
+12. Services may depend on `<Feature>Core`, shared service protocol targets, platform frameworks, and vendor SDKs.
+13. Services may support many Managers.
+14. Services should not depend on concrete Managers.
+15. Apps may depend on everything and assemble the graph.
+16. Platform targets own platform-specific shells, resources, entitlements, permissions, and presentation choices.
+17. Apps own root tree selection, route encoding/decoding, Handoff, deep links, and restoration.
+18. Modules and observable Managers should be main-actor isolated; Services and heavy work should stay off-main.
+19. Modules should not mutate root trees or push raw app routes.
+20. Root trees should expose only routes valid for the current eligibility state.
+21. App-specific Design Systems are app-owned and may depend on the repo-wide Design System.
+22. Shared modules should not depend on app-specific Design Systems unless intentionally app-specific.
